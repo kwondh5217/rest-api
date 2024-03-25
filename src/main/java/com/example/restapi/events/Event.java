@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class Event {
 
     @Id @GeneratedValue
-    private Integer id;
+    private Long id;
     private String name;
     private String description;
     private LocalDateTime beginEnrollmentDateTime;
