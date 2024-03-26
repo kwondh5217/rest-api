@@ -209,10 +209,10 @@ public class EventControllerTest {
                 )
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                // 응답에 있기를 바라는 내용
-                .andExpect(jsonPath("errors[0].objectName").exists()) // 에러 배열에서 객체 이름
-                .andExpect(jsonPath("errors[0].defaultMessage").exists()) // 기본 메시지
-                .andExpect(jsonPath("errors[0].code").exists()) // 에러 코드
+
+                .andExpect(jsonPath("errors[0].objectName").exists())
+                .andExpect(jsonPath("errors[0].defaultMessage").exists())
+                .andExpect(jsonPath("errors[0].code").exists())
                 .andExpect(jsonPath("_links.index").exists())
         ;
     }
