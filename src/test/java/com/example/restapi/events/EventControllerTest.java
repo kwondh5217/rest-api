@@ -16,6 +16,7 @@ import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
@@ -253,11 +254,49 @@ public class EventControllerTest {
 
     }
 
-    private void generateEvent(int index) {
+
+    @Test
+    @DisplayName("기존의 이벤트를 하나 조회하기")
+    void getEvent() throws Exception {
+        // given
+        Event event = generateEvent(100);
+        Long eventId = event.getId();
+
+        // when
+        ResultActions resultActions = this.mockMvc.perform(get("/api/events/{id}", eventId));
+
+        // Then
+        resultActions
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("name").exists())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andDo(document("get-an-event"))
+        ;
+    }
+
+
+    @Test
+    @DisplayName("없는 이벤트는 조회했을 때 404 응답 받기")
+    void getEvent404() throws Exception {
+        // When
+        ResultActions resultActions = this.mockMvc.perform(get("/api/events/1245"));
+
+        // Then
+        resultActions
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+
+
+    private Event generateEvent(int index) {
         Event event = Event.builder()
                 .name("event " + index)
                 .description("test event")
                 .build();
-        this.eventRepository.save(event);
+        return this.eventRepository.save(event);
     }
 }
