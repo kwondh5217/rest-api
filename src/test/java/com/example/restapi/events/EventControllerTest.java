@@ -1,5 +1,6 @@
 package com.example.restapi.events;
 
+import com.example.restapi.common.TestDescription;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -182,33 +183,37 @@ public class EventControllerTest {
         mockMvc.perform(post("/api/events")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(eventDto)))
+                .andDo(print())
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    @DisplayName("입력값이 잘못되었을 때 에러를 발생하는 테스트")
-    void createEvent_badRequest_Wrong_Input() throws Exception {
-        EventDto event = EventDto.builder()
+    @TestDescription("입력 값이 잘못된 경우에 에러가 발생하는 테스트")
+    public void createEvent_Bad_Request_Wrong_Input() throws Exception{
+        EventDto eventDto = EventDto.builder()
                 .name("Spring")
                 .description("REST API Development with Spring")
-                .beginEnrollmentDateTime(LocalDateTime.of(2024, 03, 19, 23, 33))
-                .closeEnrollmentDateTime(LocalDateTime.of(2024, 05, 14, 23, 33))
-                .beginEventDateTime(LocalDateTime.of(2024, 03, 20, 23, 33))
-                .endEventDateTime(LocalDateTime.of(2024, 03, 19, 23, 33))
+                .beginEnrollmentDateTime(LocalDateTime.of(2023, 11, 14, 11, 11))
+                .closeEnrollmentDateTime(LocalDateTime.of(2023, 11, 12, 11, 11))
+                .beginEventDateTime(LocalDateTime.of(2023, 11, 24, 11, 11))
+                .endEventDateTime(LocalDateTime.of(2023, 11, 23, 11, 11))
                 .basePrice(10000)
                 .maxPrice(200)
                 .limitOfEnrollment(100)
-                .location("송정삼정그린코아 더시티")
+                .location("이화여자대학교 신공학관")
                 .build();
 
-        mockMvc.perform(post("/api/events")
+        this.mockMvc.perform(post("/api/events")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(event)))
+                        .content(this.objectMapper.writeValueAsString(eventDto))
+                )
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$[0].objectName").exists())
-                .andExpect(jsonPath("$[0].defaultMessage").exists())
-                .andExpect(jsonPath("$[0].code").exists())
-                ;
+                // 응답에 있기를 바라는 내용
+                .andExpect(jsonPath("errors[0].objectName").exists()) // 에러 배열에서 객체 이름
+                .andExpect(jsonPath("errors[0].defaultMessage").exists()) // 기본 메시지
+                .andExpect(jsonPath("errors[0].code").exists()) // 에러 코드
+                .andExpect(jsonPath("_links.index").exists())
+        ;
     }
 }

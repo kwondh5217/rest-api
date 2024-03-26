@@ -10,11 +10,11 @@ import java.io.IOException;
 
 @JsonComponent
 public class ErrorsSerializer extends JsonSerializer<Errors> {
-
     @Override
     public void serialize(Errors errors, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+        gen.writeFieldName("errors");
         gen.writeStartArray();
-        errors.getFieldErrors().forEach(e ->{
+        errors.getFieldErrors().forEach(e -> {
             try {
                 gen.writeStartObject();
                 gen.writeStringField("field", e.getField());
@@ -26,21 +26,22 @@ public class ErrorsSerializer extends JsonSerializer<Errors> {
                     gen.writeStringField("rejectedValue", rejectedValue.toString());
                 }
                 gen.writeEndObject();
-            } catch (IOException ex) {
-                ex.printStackTrace();
+            } catch (IOException e1) {
+                e1.printStackTrace();
             }
         });
-        errors.getGlobalErrors().forEach( e-> {
-            try{
+
+        errors.getGlobalErrors().forEach(e -> {
+            try {
+                gen.writeStartObject();
                 gen.writeStringField("objectName", e.getObjectName());
                 gen.writeStringField("code", e.getCode());
                 gen.writeStringField("defaultMessage", e.getDefaultMessage());
-            } catch (IOException ex) {
-                ex.printStackTrace();
+                gen.writeEndObject();
+            } catch (IOException e1) {
+                e1.printStackTrace();
             }
-
         });
-        errors.getGlobalError();
-
+        gen.writeEndArray();
     }
 }
