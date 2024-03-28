@@ -1,6 +1,7 @@
 package com.example.restapi.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,8 +23,10 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
@@ -32,8 +35,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.modifyUris;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -46,6 +48,8 @@ public class EventControllerTest {
 
     @Autowired
     MockMvc mockMvc;
+
+    @Autowired EventController eventController;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -288,6 +292,30 @@ public class EventControllerTest {
         resultActions
                 .andExpect(status().isNotFound())
         ;
+    }
+
+    @Test
+    @DisplayName("존재하는 이벤트를 수정하기")
+    void updateEvent() throws Exception {
+        // given
+        Event event = this.generateEvent(100);
+        EventUpdateDto eventupdateDto = EventUpdateDto.builder()
+                .name("updated name")
+                .description("updated")
+                .build();
+        // when
+        this.mockMvc.perform(put("/api/events/{id}", event.getId())
+                .content(objectMapper.writeValueAsString(eventupdateDto)))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        // then
+        Optional<Event> byId = this.eventRepository.findById(event.getId());
+        assertThat(byId).isNotEmpty();
+        Event findEvent = byId.get();
+        assertThat(findEvent.getName()).isEqualTo(eventupdateDto.getName());
+        assertThat(findEvent.getDescription()).isEqualTo(eventupdateDto.getDescription());
+
     }
 
 
