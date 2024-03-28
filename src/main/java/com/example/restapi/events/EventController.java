@@ -82,6 +82,31 @@ public class EventController {
         return ResponseEntity.ok(eventResource);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity updateEvent(@PathVariable("id") Long id,
+                                      @RequestBody @Valid EventDto updateDto,
+                                      Errors errors) throws JsonProcessingException {
+        Optional<Event> optionalEvent = this.eventRepository.findById(id);
+        if(optionalEvent.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+        if(errors.hasErrors()){
+            return badRequest(errors);
+        }
+        Event event = optionalEvent.get();
+        eventValidator.validate(updateDto, errors);
+        if(errors.hasErrors()){
+            return badRequest(errors);
+        }
+
+        this.modelMapper.map(updateDto, event);
+        Event save = this.eventRepository.save(event);
+        EventResource eventResource = new EventResource(save);
+        eventResource.add(Link.of("/docs/index.html#resources-events-update").withRel("profile"));
+
+        return ResponseEntity.ok(eventResource);
+    }
+
 
 
 
