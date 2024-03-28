@@ -93,12 +93,12 @@ public class EventController {
         if(errors.hasErrors()){
             return badRequest(errors);
         }
-        Event event = optionalEvent.get();
         eventValidator.validate(updateDto, errors);
         if(errors.hasErrors()){
             return badRequest(errors);
         }
 
+        Event event = optionalEvent.get();
         this.modelMapper.map(updateDto, event);
         Event save = this.eventRepository.save(event);
         EventResource eventResource = new EventResource(save);
