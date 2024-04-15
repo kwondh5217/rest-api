@@ -1,6 +1,6 @@
 package com.example.restapi.accounts;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -13,10 +13,10 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class AccountService implements UserDetailsService {
-    @Autowired
-    AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Account account = accountRepository.findByEmail(username)
