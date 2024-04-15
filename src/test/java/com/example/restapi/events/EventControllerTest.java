@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
@@ -27,6 +28,7 @@ public class EventControllerTest extends BaseControllerTest {
     @Autowired
     EventRepository eventRepository;
 
+    @WithMockUser
     @Test
     @DisplayName("정상적으로 이벤트를 생성하는 테스트")
     void createEvent() throws Exception {
@@ -112,6 +114,7 @@ public class EventControllerTest extends BaseControllerTest {
 
     }
 
+    @WithMockUser
     @Test
     @DisplayName("입력할 수 없는 값이 들어왔을 때 에러를 발생하는 테스트")
     void createEvent_badRequest() throws Exception {
